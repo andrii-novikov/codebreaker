@@ -17,7 +17,12 @@ module Codebreaker
       game.start
       say(get_choice) while game.status == :play
       game.save if ask :save?
-      ask(:play_again?) ? new_game : say(:goodby)
+      if ask(:play_again?)
+        new_game
+      else
+        say(:scores)
+        say(:goodby)
+      end
     end
 
     def messages
@@ -27,6 +32,7 @@ module Codebreaker
           play_again?: 'Do you want play again?(yes/no)',
           again?: 'Do you want play again?(yes/no)',
           save?: 'Do you want to save result?(yes/no)',
+          scores: "BEST SCORES\n#{game.score}",
           goodby: "Goodby #{game.name}"
       }
     end
@@ -53,7 +59,7 @@ module Codebreaker
         puts "answer: #{answer}. #{game.attempts} attempts left" if game.status == :play
         answer
       elsif choice == 'q' || choice == 'quit'
-        :lose
+        game.game_over
       elsif choice == 'h' || choice == 'hint'
         hint = game.hint
         puts "Code containe #{hint}" if hint

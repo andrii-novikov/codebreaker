@@ -1,6 +1,7 @@
 module Codebreaker
   class Game
     ATTEMPTS = 10
+    SCORE_FILE_NAME = '.score'
     HINTS = 2
     attr_accessor :name
     attr_reader :attempts, :hints, :status
@@ -56,10 +57,17 @@ module Codebreaker
     end
 
     def save
-      unless name.nil?
-        data = {name: name, attempts: ATTEMPTS-attempts, hints: HINTS-hints, status: @status}.inspect
-        File.open('score','a') {|f| f.puts(data)}
+      unless File.exist? SCORE_FILE_NAME
+        File.write(SCORE_FILE_NAME,"name\tattempts\thints\tstatus\r\n")
       end
+      unless name.nil?
+        data = "#{name}\t#{ATTEMPTS-attempts}\t#{HINTS-hints}\t#{@status}"
+        File.open(SCORE_FILE_NAME,'a') {|f| f.puts(data)}
+      end
+    end
+
+    def score
+      File.read(SCORE_FILE_NAME) if File.exist? SCORE_FILE_NAME
     end
   end
 end
