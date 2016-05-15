@@ -15,8 +15,7 @@ module Codebreaker
 
     def new_game
       game.start
-      status = get_choise until [:win,:lose].include? status
-      say status
+      say(get_choice) while game.status == :play
       game.save if ask :save?
       ask(:play_again?) ? new_game : say(:goodby)
     end
@@ -45,25 +44,25 @@ module Codebreaker
       ['yes','y'].include? gets.chomp if say question
     end
 
-    def get_choise
-      puts 'Ener your choise:'
-      ans = gets.chomp
-      if game.valid_code? ans
-        status = game.check(ans)
-        status = 'Nothing matched' if status.empty?
-        puts "answer: #{status}. You have #{game.attempts} attempts" unless status == :win
-        status
-      elsif ans == 'q' || ans == 'quit'
+    def get_choice
+      puts 'Enter your choice:'
+      choice = gets.chomp
+      if game.valid_code? choice
+        answer = game.check(choice)
+        answer = 'Nothing matched' if answer.empty?
+        puts "answer: #{answer}. #{game.attempts} attempts left" if game.status == :play
+        answer
+      elsif choice == 'q' || choice == 'quit'
         :lose
-      elsif ans == 'h' || ans == 'hint'
+      elsif choice == 'h' || choice == 'hint'
         hint = game.hint
         puts "Code containe #{hint}" if hint
         puts "You have #{game.hints} hints"
-      elsif ans == 'help'
+      elsif choice == 'help'
         puts help
       else
         print "Wrong code. "
-        get_choise
+        get_choice
       end
     end
 
