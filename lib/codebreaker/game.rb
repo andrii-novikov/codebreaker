@@ -1,17 +1,19 @@
 module Codebreaker
   class Game
-
+    ATTEMPTS = 10
+    HINTS = 2
     attr_accessor :name, :attempts, :hints
 
     def initialize
       @name = nil
+      @status = nil
       start
     end
 
     def start
       @code = generate
-      @attempts = 10
-      @hints = 2
+      @attempts = ATTEMPTS
+      @hints = HINTS
     end
 
     def check(guess)
@@ -31,7 +33,7 @@ module Codebreaker
     end
 
     def game_over(win = false)
-      win ? :win : :lose
+      @status = win ? :win : :lose
     end
 
     def valid_code?(code)
@@ -48,6 +50,13 @@ module Codebreaker
       if hints > 0
         @hints-=1
         @code[rand(4)]
+      end
+    end
+
+    def save
+      unless name.nil?
+        data = {name: name, attempts: ATTEMPTS-attempts, hints: HINTS-hints, status: @status}.inspect
+        File.open('score','a') {|f| f.puts(data)}
       end
     end
   end

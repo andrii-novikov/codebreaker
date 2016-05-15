@@ -16,19 +16,33 @@ module Codebreaker
     def new_game
       game.start
       status = get_choise until [:win,:lose].include? status
-      puts messages[status]
-      if gets.chomp == 'yes'
-        new_game
-      else
-        puts game.name.nil? ? 'Goodby' : "Goodby #{game.name.capitalize}"
-      end
+      say status
+      game.save if ask :save?
+      ask(:play_again?) ? new_game : say(:goodby)
     end
 
     def messages
       {
-          win: "You win! Do you want play again?(yes/no)",
-          lose: "Game over, you are lose. Do you want play again?(yes/no)"
+          win: 'You win!',
+          lose: 'Game over, you are lose.',
+          play_again?: 'Do you want play again?(yes/no)',
+          again?: 'Do you want play again?(yes/no)',
+          save?: 'Do you want to save result?(yes/no)',
+          goodby: "Goodby #{game.name}"
       }
+    end
+
+    def say(message)
+      if messages.has_key? message
+        puts messages[message]
+        true
+      else
+        false
+      end
+    end
+
+    def ask(question)
+      ['yes','y'].include? gets.chomp if say question
     end
 
     def get_choise

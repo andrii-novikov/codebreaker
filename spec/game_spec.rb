@@ -54,7 +54,26 @@ module Codebreaker
     end
 
     describe "#save" do
-      it "shoud create or update file"
+      before do
+        File.write('dump',File.read('score')) if File.exist? 'score'
+      end
+      after do
+        if File.exist? 'dump'
+          File.write('score',File.read('dump'))
+          File.delete('dump')
+        else
+          File.delete 'score' if File.exist? 'score'
+        end
+      end
+      it "shoud create file" do
+        game.instance_variable_set(:@name, 'test')
+        game.save
+        expect(File.exist? 'score').to eq true
+      end
+      it 'shoud change size by 1' do
+        game.instance_variable_set(:@name, 'test')
+        expect {game.save}.to change {File.read('score').lines.count}.by(1)
+      end
     end
   end
 end
