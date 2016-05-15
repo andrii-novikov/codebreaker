@@ -2,7 +2,8 @@ module Codebreaker
   class Game
     ATTEMPTS = 10
     HINTS = 2
-    attr_accessor :name, :attempts, :hints
+    attr_accessor :name
+    attr_reader :attempts, :hints, :status
 
     def initialize
       @name = nil
@@ -14,12 +15,13 @@ module Codebreaker
       @code = generate
       @attempts = ATTEMPTS
       @hints = HINTS
+      @status = :play
     end
 
     def check(guess)
-      return game_over if attempts == 0
-      raise ArgumentError.new('Guess must have 4 numbers from 1 to 6') if !valid_code?(guess)
       @attempts -= 1
+      return game_over unless attempts > 0
+      raise ArgumentError.new('Guess must have 4 numbers from 1 to 6') if !valid_code?(guess)
       ans = guess.to_s.chars.map.with_index do |number,index|
         if number == @code.chars[index]
           '+'

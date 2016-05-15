@@ -7,6 +7,9 @@ module Codebreaker
       it 'generates a secret code' do
         expect(game.instance_variable_get(:@code)).not_to be_empty
       end
+      it 'set status to :play' do
+        expect(game.status).to eq :play
+      end
     end
 
     describe "#generate" do
@@ -18,6 +21,15 @@ module Codebreaker
       end
       it 'different codes each time' do
         expect(game.generate).not_to eq game.generate
+      end
+    end
+
+    describe '#game_over' do
+      it 'return :lose with any args' do
+        expect(game.game_over).to eq :lose
+      end
+      it 'return :win with arg' do
+        expect(game.game_over true).to eq :win
       end
     end
 
@@ -36,7 +48,6 @@ module Codebreaker
       end
       it 'decrease attemps number' do
         expect {game.check "1232"}.to change {game.attempts}.by(-1)
-
       end
       it 'answer with lose if run out attempt' do
         allow(game).to receive(:attempts).and_return(0)
