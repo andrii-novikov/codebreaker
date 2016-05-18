@@ -35,17 +35,18 @@ module Codebreaker
 
     describe '#check_guess' do
       before {allow_any_instance_of(Game).to receive(:generate).and_return('1234')}
-      context 'if guess' do
-        it 'equal secret then answer with ++++' do
-          expect(game.check "1234").to eq :win
-        end
-        it 'has numbers form secret then answer contained + or -' do
-          expect(game.check "1111").to eq "+"
-        end
-        it 'haven\'t numbers from secret then answer with nothing matched' do
-          expect(game.check "6666").to eq ''
+      variants = [
+          [5555,''], [1555,'+'], [2555,'-'], [5254,'++'], [5154,'+-'],
+          [2545,'--'], [5234,'+++'], [5134,'++-'], [5124,'+--'], [5123,'---'],
+          [1234,:win], [1243,'++--'], [1423,'+---'], [4321,'----']
+      ]
+
+      variants.each do |variant|
+        it "must return #{variant[1]} when guess = #{variant[0]}" do
+          expect(game.check variant[0]).to eq variant[1]
         end
       end
+
       it 'decrease attemps number' do
         expect {game.check "1232"}.to change {game.attempts}.by(-1)
       end

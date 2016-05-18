@@ -23,16 +23,24 @@ module Codebreaker
       @attempts -= 1
       return game_over unless attempts > 0
       raise ArgumentError.new('Guess must have 4 numbers from 1 to 6') if !valid_code?(guess)
-      ans = guess.to_s.chars.map.with_index do |number,index|
-        if number == @code.chars[index]
+      ans = guess.to_s.chars
+      code = @code.dup
+      ans.map!.with_index do |char, index|
+        if char == code[index]
+          code = code.chars.map {|code_char| code_char == char ? '+' : code_char}.join
           '+'
-        elsif @code[index..-1].include? number
-          '-'
         else
-          ''
+          char
         end
       end
-      ans.join == "++++" ? game_over(true) : ans.join
+      ans.map! do |char|
+        if char == '+'
+          '+'
+        else
+          code.include?(char) ? '-' : ''
+        end
+      end
+      ans.join == "++++" ? game_over(true) : ans.sort.join
     end
 
     def game_over(win = false)
