@@ -53,18 +53,14 @@ module Codebreaker
     def get_choice
       puts 'Enter your choice:'
       choice = gets.chomp
-      if game.valid_code? choice
-        answer = game.check(choice)
-        answer = 'Nothing matched' if answer.empty?
-        puts "answer: #{answer}. #{game.attempts} attempts left" if game.status == :play
-        answer
-      elsif choice == 'q' || choice == 'quit'
+      case
+      when game.valid_code?(choice)
+        check choice
+      when ['q','quit'].include?(choice)
         game.game_over
-      elsif choice == 'h' || choice == 'hint'
-        hint = game.hint
-        puts "Code containe #{hint}" if hint
-        puts "You have #{game.hints} hints"
-      elsif choice == 'help'
+      when ['h','hint'].include?(choice)
+        hint
+      when 'help' == choice
         puts help
       else
         print "Wrong code. "
@@ -74,6 +70,19 @@ module Codebreaker
 
     def help
       File.read('help')
+    end
+
+    def check(choice)
+      answer = game.check(choice)
+      answer = 'Nothing matched' if answer.empty?
+      puts "answer: #{answer}. #{game.attempts} attempts left" if game.status == :play
+      answer
+    end
+
+    def hint
+      hint = game.hint
+      puts "Code containe #{hint}" if hint
+      puts "You have #{game.hints} hints"
     end
   end
 

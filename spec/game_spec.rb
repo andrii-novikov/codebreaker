@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module Codebreaker
   RSpec.describe Game do
-    let(:game) {Game.new}
+    let(:game) {subject}
     describe '#start' do
       it 'generates a secret code' do
         expect(game.instance_variable_get(:@code)).not_to be_empty
