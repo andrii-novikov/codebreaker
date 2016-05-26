@@ -66,27 +66,28 @@ module Codebreaker
     end
 
     describe "#save" do
-      DUMP_FILE = 'dump'
       around do |example|
-        if File.exist? Game::SCORE_FILE_NAME
-          File.write(DUMP_FILE,File.read(Game::SCORE_FILE_NAME))
+        DUMP_FILE ||= 'dump'
+        SCORE_FILE_NAME ||= game.default[:score_file_name]
+        if File.exist? SCORE_FILE_NAME
+          File.write(DUMP_FILE,File.read(SCORE_FILE_NAME))
         end
         example.run
         if File.exist? DUMP_FILE
-          File.write(Game::SCORE_FILE_NAME, File.read(DUMP_FILE))
+          File.write(SCORE_FILE_NAME, File.read(DUMP_FILE))
           File.delete(DUMP_FILE)
         else
-          File.delete Game::SCORE_FILE_NAME if File.exist? Game::SCORE_FILE_NAME
+          File.delete SCORE_FILE_NAME if File.exist? SCORE_FILE_NAME
         end
       end
       it "shoud create file" do
         game.instance_variable_set(:@name, 'test')
         game.save
-        expect(File.exist? Game::SCORE_FILE_NAME).to eq true
+        expect(File.exist? SCORE_FILE_NAME).to eq true
       end
       it 'shoud change size by 1' do
         game.instance_variable_set(:@name, 'test')
-        expect {game.save}.to change {File.read(Game::SCORE_FILE_NAME).lines.count}.by(1)
+        expect {game.save}.to change {File.read(SCORE_FILE_NAME).lines.count}.by(1)
       end
     end
   end

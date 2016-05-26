@@ -1,21 +1,20 @@
 module Codebreaker
   class Game
-    ATTEMPTS = 10
-    SCORE_FILE_NAME = '.score'
-    HINTS = 2
+    
     attr_accessor :name
-    attr_reader :attempts, :hints, :status
+    attr_reader :attempts, :hints, :status, :default
 
-    def initialize
-      @name = nil
+    def initialize(name = nil, attempts = 10, hints = 2, score_file_name = '.score')
+      @name = name
       @status = nil
+      @default = {attempts: attempts, hints: hints, score_file_name: score_file_name}
       start
     end
 
     def start
       @code = generate
-      @attempts = ATTEMPTS
-      @hints = HINTS
+      @attempts = default[:attempts]
+      @hints = default[:hints]
       @status = :play
     end
 
@@ -24,11 +23,11 @@ module Codebreaker
       return game_over unless attempts > 0
       return game_over(true) if guess.to_s == @code
       raise ArgumentError.new('Guess must have 4 numbers from 1 to 6') if !valid_code?(guess)
-      @guess_code = [guess.to_s.chars, @code.dup.chars]
-      ans = ''
-      ans << check_for_plus
-      ans << check_for_minus
-      ans
+      guess = guess.to_s.chars
+      code = @code.dup.chars
+
+      guess, code, ans = check_for_plus(guess,code)
+      ans << check_for_minus(guess,code)
     end
 
     def game_over(win = false)
@@ -50,45 +49,47 @@ module Codebreaker
     end
 
     def save
-      unless File.exist? SCORE_FILE_NAME
-        File.write(SCORE_FILE_NAME,"name\tattempts\thints\tstatus\r\n")
+      unless File.exist? default[:score_file_name]
+        File.write(default[:score_file_name],"name\tattempts\thints\tstatus\r\n")
       end
       unless name.nil?
-        data = "#{name}\t#{ATTEMPTS-attempts}\t#{HINTS-hints}\t#{@status}"
-        File.open(SCORE_FILE_NAME,'a') {|f| f.puts(data)}
+        data = "#{name}\t#{default[:attempts]-attempts}\t#{default[:hints]-hints}\t#{status}"
+        File.open(default[:score_file_name],'a') {|f| f.puts(data)}
       end
     end
 
     def score
-      File.read(SCORE_FILE_NAME) if File.exist? SCORE_FILE_NAME
+      File.read(default[:score_file_name]) if File.exist? default[:score_file_name]
+    end
+
+    def in_play?
+      status == :play
+    end
+
+    def win?
+      status == :win
+    end
+
+    def lose?
+      status == :lose
     end
 
     private
-    def check_for_plus
-      ans = ""
-      transponse_code
-      @guess_code.delete_if do |pair|
-        if pair[0]==pair[1]
-          ans << '+'
-          true
-        end
-      end
-      transponse_code
-      ans
-    end
-
-    def transponse_code
-      @guess_code = @guess_code.transpose
-    end
-
-    def check_for_minus
+    def check_for_plus(guess, code)
       ans = ''
-      guess, code = @guess_code
-      guess.each_with_index do |g,i|
-        if code.include? g
-          ans << '-'
-          code.delete_at(code.index(g))
-        end
+      guess, code = [guess,code].transpose.delete_if do |pair|
+        ans << '+' if pair.uniq.size == 1
+      end.transpose
+      [guess,code,ans]
+    end
+
+    def check_for_minus(guess,code)
+      ans = ''
+      guess.each do |g|
+        index = code.index(g)
+        next if index.nil?
+        ans << '-'
+        code.delete_at(index)
       end
       ans
     end

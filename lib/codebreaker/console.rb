@@ -15,7 +15,7 @@ module Codebreaker
 
     def new_game
       game.start
-      say(get_choice) while game.status == :play
+      say(get_choice) while game.in_play?
       game.save if ask :save?
       if ask(:play_again?)
         new_game
@@ -75,7 +75,7 @@ module Codebreaker
     def check(choice)
       answer = game.check(choice)
       answer = 'Nothing matched' if answer.empty?
-      puts "answer: #{answer}. #{game.attempts} attempts left" if game.status == :play
+      puts "answer: #{answer}. #{game.attempts} attempts left" if game.in_play?
       answer
     end
 
