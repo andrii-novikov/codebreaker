@@ -19,13 +19,12 @@ module Codebreaker
     end
 
     def check(guess)
-      @attempts -= 1
-      return game_over unless attempts > 0
-      return game_over(true) if guess.to_s == @code
       raise ArgumentError.new('Guess must have 4 numbers from 1 to 6') if !valid_code?(guess)
+      @attempts -= 1
+      return game_over(true) if guess.to_s == @code
+      return game_over unless attempts > 0
       guess = guess.to_s.chars
       code = @code.dup.chars
-
       guess, code, ans = check_for_plus(guess,code)
       ans << check_for_minus(guess,code)
     end
