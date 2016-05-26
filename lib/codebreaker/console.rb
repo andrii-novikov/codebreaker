@@ -62,6 +62,8 @@ module Codebreaker
         hint
       when 'help' == choice
         puts help
+      when 'history' == choice
+        puts game.history
       else
         print "Wrong code. "
         get_choice

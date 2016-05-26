@@ -52,7 +52,7 @@ module Codebreaker
       end
       it 'answer with lose if run out attempt' do
         allow(game).to receive(:attempts).and_return(0)
-        expect(game.check "1234").to eq :lose
+        expect(game.check "4444").to eq :lose
       end
     end
 

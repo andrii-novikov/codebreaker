@@ -2,12 +2,13 @@ module Codebreaker
   class Game
     
     attr_accessor :name
-    attr_reader :attempts, :hints, :status, :default
+    attr_reader :attempts, :hints, :status, :default, :history
 
     def initialize(name = nil, attempts = 10, hints = 2, score_file_name = '.score')
       @name = name
       @status = nil
       @default = {attempts: attempts, hints: hints, score_file_name: score_file_name}
+      @history = []
       start
     end
 
@@ -23,10 +24,9 @@ module Codebreaker
       @attempts -= 1
       return game_over(true) if guess.to_s == @code
       return game_over unless attempts > 0
-      guess = guess.to_s.chars
-      code = @code.dup.chars
-      guess, code, ans = check_for_plus(guess,code)
-      ans << check_for_minus(guess,code)
+      answer = get_answer guess
+      history << [guess,answer]
+      answer
     end
 
     def game_over(win = false)
@@ -74,6 +74,12 @@ module Codebreaker
     end
 
     private
+    def get_answer(guess)
+      guess = guess.to_s.chars
+      code = @code.dup.chars
+      guess, code, ans = check_for_plus(guess,code)
+      ans << check_for_minus(guess,code)
+    end
     def check_for_plus(guess, code)
       ans = ''
       guess, code = [guess,code].transpose.delete_if do |pair|
