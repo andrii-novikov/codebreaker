@@ -17,6 +17,7 @@ module Codebreaker
       @attempts = default[:attempts]
       @hints = default[:hints]
       @status = :play
+      @history = []
     end
 
     def check(guess)
